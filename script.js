@@ -3,7 +3,7 @@ let cityHistory = $(".history")
 //call out todayCast div with id #today
 let todaysForecast = $("#today")
 //call out fiveCast with id #forecast
-let fiveDayForecast = $("#forcast")
+let fiveDayForecast = $("#forecast")
 //call out searchField input with id#search-value
 let searchField = $("#search-value")
 //call out searchButton with id#search-button
@@ -15,7 +15,7 @@ let monster;
 searchButton.on("click", function() {
     searchForCity();
     //Value of searchField
-    searchField.val("");
+    //searchField.val("");
 } )
     
 function searchForCity() {
@@ -23,27 +23,28 @@ function searchForCity() {
    if(!parseInt(searchField.val().trim())) {
         console.log("hello");
         //Save to local storage
-        localStorage.setItem("search", searchField.val().trim());
-        newButton();
+        //localStorage.setItem("search", searchField.val().trim());
+        //newButton();
         generateWeather(searchField.val().trim())
    }else {
        alert("Enter a valid city name, Use only letters")
    }
-   
+
 };    
    
     
 //Makes a new button
-function newButton() {
+function newButton(cube) {
     let button = $("<button>")
     //Gives text and value equal to searchField in local storage
-    button.val(localStorage.getItem("search"));
-    button.text(localStorage.getItem("search"))
+    button.val(cube);
+    button.text(cube)
     //Gives button class of searchedCity
     button.attr("class", "searchedCity");
     //When button gets clicked
     button.on("click", function() {
-    generateWeather(button.val())
+    localStorage.setItem("search", button.val().trim())
+    buttonForWeather(button.val())
     }); 
     //Appends button to cityHistory
     cityHistory.append(button);
@@ -59,12 +60,36 @@ function generateWeather(cube) {
     $.ajax({
         url: queryURL,
         method: "GET"
-      }).then(function(response) {
+      }).done(function(response) {
         console.log(queryURL);
         console.log(response);
         contructToday(response);
         monster = response;
-    });
+        localStorage.setItem("search", searchField.val().trim());
+        newButton(searchField.val().trim());
+        searchField.val("");
+    }).fail(function() {
+        alert("Please use another input")
+        searchField.val("")
+    })
+
+}
+
+function buttonForWeather(cube) {
+    
+
+    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+ cube + "&appid=" + myKey;
+
+    $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).done(function(response) {
+        console.log(queryURL);
+        console.log(response);
+        contructToday(response);
+        monster = response;
+    })
+
 }
 
     
@@ -114,7 +139,7 @@ function contructToday(cube) {
         ultraviolet = $("<p><strong>UV Index: </strong></p>")
         ultraviolet.append(currentUV)
         todaysForecast.append(ultraviolet)
-
+        futureForcast(response.daily)
 
     });
     
@@ -129,7 +154,7 @@ function futureForcast(cube) {
     for (let i=1; i<6; i++) {
         //Creates 5 blocks
         let forecastBlock = $("<div>")
-        forecastBlock.attr("class", "col-2 bg-primary border rounded text-light p-2 m-2")
+        forecastBlock.attr("class", "col-2 bg-primary border rounded text-light p-2 pl-4 pr-4 forecast")
 
         //Date
         const event = new Date(cube[i].dt*1000);
@@ -141,6 +166,7 @@ function futureForcast(cube) {
         let currentConditions = $("<p><strong>Sky Condition:</strong></p>")
         let weatherIcon = $("<img>")
         weatherIcon.attr("src", "http://openweathermap.org/img/wn/" + cube[i].weather[0].icon + "@2x.png")
+        weatherIcon.attr("width", "40vw")
         currentConditions.attr("class", "row")
         currentConditions.append(weatherIcon)
         forecastBlock.append(currentConditions)
@@ -165,5 +191,8 @@ function futureForcast(cube) {
     
 }
 
-newButton();
+
+if( localStorage.getItem("search")) {
+    newButton(localStorage.getItem("search"))
+};
            
