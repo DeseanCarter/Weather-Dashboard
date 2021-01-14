@@ -11,19 +11,18 @@ let searchButton = $("#search-button")
 let myKey = config.MY_API_KEY 
 let monster;
 
- console.log("KEY", myKey )
-//when i click on the search button 
+ //Search Button Onclick 
 searchButton.on("click", function() {
     searchForCity();
-    //value of searchField
+    //Value of searchField
     searchField.val("");
 } )
     
 function searchForCity() {
-    //check to make sure this is a valid input (city name not skljdfksj or 2478834 or lizard) - only checks for pure numbers
+    //Valid city serch
    if(!parseInt(searchField.val().trim())) {
         console.log("hello");
-        //local storage
+        //Save to local storage
         localStorage.setItem("search", searchField.val().trim());
         newButton();
         generateWeather(searchField.val().trim())
@@ -33,29 +32,29 @@ function searchForCity() {
    
 };    
    
-    //grab current value of searchField
-    //make a button
+    
+//Makes a new button
 function newButton() {
     let button = $("<button>")
-     //give text and value equal to searchField
+    //Gives text and value equal to searchField in local storage
     button.val(localStorage.getItem("search"));
     button.text(localStorage.getItem("search"))
-    //give button class.searchedCity
+    //Gives button class of searchedCity
     button.attr("class", "searchedCity");
-    //when i click the button
+    //When button gets clicked
     button.on("click", function() {
-        generateWeather(button.val())
-    }) 
-    //append button to cityHistory
+    generateWeather(button.val())
+    }); 
+    //Appends button to cityHistory
     cityHistory.append(button);
 }    
 
-//call weather API
-    //give it a city name with crocodile
-function generateWeather(crocodile) {
+//Calls the Weather API
+    
+function generateWeather(cube) {
     
 
-    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+ crocodile + "&appid=" + myKey;
+    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+ cube + "&appid=" + myKey;
 
     $.ajax({
         url: queryURL,
@@ -68,41 +67,35 @@ function generateWeather(crocodile) {
     });
 }
 
-    //give city name
-    //return a response
-
-            //give text and value equal to searchField
-            //append button to cityHistory
-                //when i click this button, todayCast and fiveCast are ppulated w/ info on this button's value
-    //populate todayCast w/ info 
-function contructToday(crocodile) {
+    
+//Appends todays Informationg    
+function contructToday(cube) {
     todaysForecast.empty();
-    let cityName= $("<p><strong>City Name:</strong> "+ crocodile.name + "</p>")
+    let cityName= $("<p><strong>City Name:</strong> "+ cube.name + "</p>")
     todaysForecast.append(cityName)
-    const event = new Date(crocodile.dt*1000);
-    //console.log(event.toDateString());
+    const event = new Date(cube.dt*1000);
+    console.log(event.toDateString());
     let todayDate = $("<p><strong>Today's Date:</strong> "+ event.toDateString() + "</p>")
     todaysForecast.append(todayDate);
-    let currentConditions = $("<p><strong>Current Conditions:</stong> "+ crocodile.weather[0].description + "</p>")
+    let currentConditions = $("<p><strong>Current Conditions:</stong> "+ cube.weather[0].description + "</p>")
     let weatherIcon = $("<img>")
     weatherIcon.attr("src",
-                "http://openweathermap.org/img/wn/" + crocodile.weather[0].icon + "@2x.png"
+                "http://openweathermap.org/img/wn/" + cube.weather[0].icon + "@2x.png"
     )
     currentConditions.append(weatherIcon)
     todaysForecast.append(currentConditions)
-    let currentTemp = crocodile.main.temp;
-    currentTemp = (crocodile.main.temp - 273.15) * 1.80 + 32;
+    let currentTemp = cube.main.temp;
+    currentTemp = (cube.main.temp - 273.15) * 1.80 + 32;
     let tempDisplay = $("<p><strong>Current Temperature:</strong> "+currentTemp.toFixed(2) + "°F</p>")
     todaysForecast.append(tempDisplay);
-    let currentHumidity = $("<p><strong>Humidity:</strong> "+ crocodile.main.humidity + "%</p>")
+    let currentHumidity = $("<p><strong>Humidity:</strong> "+ cube.main.humidity + "%</p>")
     todaysForecast.append(currentHumidity);
-    let windSpeed = $("<p><strong>Wind Speed:</strong> "+ (crocodile.wind.speed * 2.237).toFixed(2) + "mph</p>")
+    let windSpeed = $("<p><strong>Wind Speed:</strong> "+ (cube.wind.speed * 2.237).toFixed(2) + "mph</p>")
     todaysForecast.append(windSpeed);
     
-    // ultraviolet.attr("style", "background-color", "blue")
-    //crocodile.coord.lat + corcodile.coord.lon into ajax url
     
-    var oneCallURL = "https://api.openweathermap.org/data/2.5/onecall?lat="+ crocodile.coord.lat + "&lon=" + crocodile.coord.lon + "&exclude=alerts&appid=" + myKey;
+    //UVI AJAX call
+    var oneCallURL = "https://api.openweathermap.org/data/2.5/onecall?lat="+ cube.coord.lat + "&lon=" + cube.coord.lon + "&exclude=alerts&appid=" + myKey;
 
     $.ajax({
         url: oneCallURL,
@@ -121,44 +114,56 @@ function contructToday(crocodile) {
         ultraviolet = $("<p><strong>UV Index: </strong></p>")
         ultraviolet.append(currentUV)
         todaysForecast.append(ultraviolet)
+
+
     });
     
-    
-
-
-
-
-
-    
-
-    
 };  
-        //city name
-        //the date
-        //an icon representation of weather condition
-        //the temp
-        //the humidity
-        //wind speed
-        //uv index
-            //uv index is displayed in color coded field
-                //three codes
-                    //favorable
-                    //moderate
-                    //or severe
 
+function futureForcast(cube) {
+    fiveDayForecast.empty();
+    let fiveDays = $("<div>")
+    fiveDays.attr("class", "row bg-light border rounded")
+    fiveDayForecast.append("<h1>Five Day Forecast:</h1>")
+    
+    for (let i=1; i<6; i++) {
+        //Creates 5 blocks
+        let forecastBlock = $("<div>")
+        forecastBlock.attr("class", "col-2 bg-primary border rounded text-light p-2 m-2")
 
-    //populate fivCast w info
-        //create div - 5 times
-            //give new background
-            //fill w todays date + 1 info
-                // the date
-                //an icon representation of weather ocndition
-                //the temp
-                //the humidity   
-                
-                
-    //when i refresh,
-        //i populate todayCast and fiveCas with last search
-        //*****I populate cityHistory with search history with local storage
-        newButton();
-            //***append button to cityHistory to clear search history
+        //Date
+        const event = new Date(cube[i].dt*1000);
+        let dateValue = $("<p><strong>" + event.toDateString() + "</strong></p>")
+        dateValue.attr("class", "row")
+        forecastBlock.append(dateValue);
+
+        //Waether icon
+        let currentConditions = $("<p><strong>Sky Condition:</strong></p>")
+        let weatherIcon = $("<img>")
+        weatherIcon.attr("src", "http://openweathermap.org/img/wn/" + cube[i].weather[0].icon + "@2x.png")
+        currentConditions.attr("class", "row")
+        currentConditions.append(weatherIcon)
+        forecastBlock.append(currentConditions)
+
+        //Temperatue 
+        let currentTemp = cube[i].temp.day;
+        currentTemp = (currentTemp - 273.15) * 1.80 + 32;
+        let tempDisplay = $("<p><strong>Temperature:</strong> "+ currentTemp.toFixed(2) + "°F</p>")
+        tempDisplay.attr("class", "row")
+        forecastBlock.append(tempDisplay);
+
+        //Humidity
+        let currentHumidity = $("<p><strong>Humidity:</strong> "+ cube[i].humidity +"%</p>")
+        currentHumidity.attr("class", "row")
+        forecastBlock.append(currentHumidity);
+
+        //Appends Blocks to Column
+        fiveDays.append(forecastBlock);
+    }
+
+    fiveDayForecast.append(fiveDays);
+    
+}
+
+newButton();
+           
